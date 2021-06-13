@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% block page_title %}Exam Detail{% endblock %}
+{% block content %}
+    <div class="card">
+        <div class="card-header font-weight-bold">
+            {{ user_exam.user }} | {{ user_exam.exam }}
+        </div>
+        <div class="card-body p-0 m-0">
+            <h4 class="p-2 mb-2">Question List</h4>
+            <div class="table-responsive">
+                <table class="table table-sm table-bordered mb-0">
+                    <tr>
+                        <th style="width: 1%">#</th>
+                        <th>Question</th>
+                        <th>Type</th>
+                        <th>Answer</th>
+                        <th>In Correct</th>
+                    </tr>
+                    {% for qs in user_exam.answer_user_exam.all %}
+                        <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ qs.question.title }}</td>
+                        <td>{{ qs.question.get_question_type_display }}</td>
+                        <td>{{ qs.choice.title }}</td>
+                        <td>{{ qs.choice.is_answer }}</td>
+                        </tr>
+                    {% endfor %}
+                </table>
+            </div>
+        </div>
+    </div>
+{% endblock %}

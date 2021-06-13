@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% block page_title %}Users{% endblock %}
+{% block content %}
+    <div class="card">
+        <div class="card-header font-weight-bold">
+            Users
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-sm table-bordered mb-0">
+                    <tr>
+                        <th style="width: 1%">#</th>
+                        <th>First Name</th>
+                        <th>Last Name</th>
+                        <th>Username</th>
+                    </tr>
+                    {% for user in users %}
+                        <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td>{{ user.first_name }}</td>
+                            <td>{{ user.last_name }}</td>
+                            <td>{{ user.username }}</td>
+
+                        </tr>
+                    {% endfor %}
+                </table>
+            </div>
+        </div>
+    </div>
+{% endblock %}
