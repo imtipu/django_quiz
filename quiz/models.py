@@ -1,8 +1,9 @@
 from django.core.exceptions import ValidationError
 from django.db import models
 
-
 # Create your models here.
+from django.utils.functional import cached_property
+
 
 class Exam(models.Model):
     title = models.CharField(max_length=250, null=False)
@@ -34,12 +35,14 @@ class Question(models.Model):
 
     title = models.CharField(max_length=250, null=False)
     question_type = models.CharField(choices=QUESTION_TYPE_CHOICES, default='single', max_length=20)
+    choices = models.ManyToManyField('quiz.QuestionChoice', related_name='question_choices', blank=True)
+    correct_choices = models.ManyToManyField('quiz.QuestionChoice', related_name='question_answer_choices', blank=True)
 
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return '%s' % self.title
+        return 'Exam: % s - %s' % (self.exam.pk, self.title)
 
     class Meta:
         ordering = ('title',)
@@ -48,9 +51,10 @@ class Question(models.Model):
 
 
 class QuestionChoice(models.Model):
-    question = models.ForeignKey('quiz.Question', on_delete=models.CASCADE, related_name='choice_question')
+    question = models.ForeignKey('quiz.Question', on_delete=models.CASCADE, default=None,
+                                 related_name='choice_question')
     title = models.CharField(max_length=250, null=False)
-    is_answer = models.BooleanField(default=False)
+    # is_answer = models.BooleanField(default=False)
 
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
@@ -89,33 +93,21 @@ class QuestionAnswer(models.Model):
     user_exam = models.ForeignKey('quiz.UserExam', on_delete=models.CASCADE, default=None, null=False,
                                   related_name='answer_user_exam')
     question = models.ForeignKey('quiz.Question', on_delete=models.CASCADE, related_name='answer_question')
-    # choice = models.ForeignKey('quiz.QuestionChoice', on_delete=models.CASCADE, related_name='answer_choice')
     answers = models.ManyToManyField('quiz.QuestionChoice')
+
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 
     @property
     def check_answer(self):
-        if self.question.question_type == 'single':
-            return self.question.choice_question.filter(is_answer=True).count() == 1
-        return self.question.choice_question.filter(is_answer=True, question__question_type='multiple').exists()
-
-    # def get_answers(self):
-    #     return self.choice_set.filter(is_answer=True)
+        q1 = self.question.correct_choices.all()
+        q2 = self.answers.all()
+        if not q1.count() < 1 and not q2.count() < 1:
+            return set(q1) == set(q2)
+        return False
 
     def __str__(self):
         return '%s' % self.question.title[:50]
-
-    # def clean(self):
-    #     print(self.answers.all())
-        # if self.pk is None:
-        #     check_ans_exist = QuestionAnswer.objects.filter(question=self.question, user_exam=self.user_exam).exists()
-        #     print(check_ans_exist)
-        #     if self.question.question_type == 'single' and check_ans_exist:
-        #         raise ValidationError({'answers': 'You have already answered this question'})
-        # elif self.pk:
-        #     if self.question.question_type == 'single' and self.answers.count() > 1:
-        #         raise ValidationError({'answers': 'You can only select one answer'})
 
     class Meta:
         ordering = ('created',)

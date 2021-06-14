@@ -23,7 +23,7 @@
                             <td>{{ exam.created }}</td>
                             <td>
                                 <a class="btn btn-sm btn-primary"
-                                   href="{% url 'quiz:user_exam_detail' exam.id %}">List</a>
+                                   href="{% url 'users:user_exam_detail' exam.user.id exam.id %}">List</a>
                             </td>
                         </tr>
                     {% endfor %}

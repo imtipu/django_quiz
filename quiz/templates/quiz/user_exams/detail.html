@@ -6,6 +6,7 @@
             {{ user_exam.user }} | {{ user_exam.exam }}
         </div>
         <div class="card-body p-0 m-0">
+        {{ user_exam }}
             <h4 class="p-2 mb-2">Question List</h4>
             <div class="table-responsive">
                 <table class="table table-sm table-bordered mb-0">
@@ -14,15 +15,38 @@
                         <th>Question</th>
                         <th>Type</th>
                         <th>Answer</th>
-                        <th>In Correct</th>
+                        <th>Correct Answers</th>
+                        <th>Correct</th>
                     </tr>
                     {% for qs in user_exam.answer_user_exam.all %}
                         <tr>
-                        <td>{{ forloop.counter }}</td>
-                        <td>{{ qs.question.title }}</td>
-                        <td>{{ qs.question.get_question_type_display }}</td>
-                        <td>{{ qs.choice.title }}</td>
-                        <td>{{ qs.choice.is_answer }}</td>
+                            <td>{{ forloop.counter }}</td>
+                            <td>{{ qs.question.title }}</td>
+                            <td>{{ qs.question.get_question_type_display }}</td>
+                            <td>
+                                <ul class="list-unstyled">
+                                    {% for ans in qs.answers.all %}
+                                        <li>{{ forloop.counter }}. {{ ans }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </td>
+                            <td>
+                                <ul class="list-unstyled">
+                                    {% for ans in qs.question.correct_choices.all %}
+                                        <li>{{ forloop.counter }}. {{ ans }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </td>
+
+                            <td>
+                            <div>Correct: {{ qs.check_answer }}</div>
+{#                                {% if qs.check_answer %}#}
+{#                                    <span class="ans-corrent icon text-success"><i class="bi bi-check-square-fill"></i></span>#}
+{#                                {% else %}#}
+{#                                    <span class="ans-corrent icon text-danger"><i#}
+{#                                            class="bi bi-file-excel-fill"></i></span>#}
+{#                                {% endif %}#}
+                            </td>
                         </tr>
                     {% endfor %}
                 </table>
