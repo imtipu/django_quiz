@@ -10,8 +10,10 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 import os.path
+import environ
 from pathlib import Path
 
+env = environ.Env()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -19,10 +21,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-wj(axh_j=&gy4qw99-gs+655^ydm84z8_k-o@&ly&t!mbg%639'
+SECRET_KEY = env.str('SECRET_KEY', 'secret_key')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = env.bool('DEBUG', True)
 
 ALLOWED_HOSTS = ['*']
 
@@ -129,7 +131,6 @@ STATICFILES_DIRS = [
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-
 # debug_toolbar moved here.
 if DEBUG:
     MIDDLEWARE += [
@@ -142,6 +143,7 @@ if DEBUG:
 
     # this is the main reason for not showing up the toolbar
     import mimetypes
+
     mimetypes.add_type("application/javascript", ".js", True)
 
     DEBUG_TOOLBAR_CONFIG = {
